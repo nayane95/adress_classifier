@@ -5,8 +5,14 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, logActivity } from '../_shared/supabase.ts';
 import { classifyByRules, applyFieldHeuristics } from '../_shared/rules-engine.ts';
 import { NormalizedContact } from '../_shared/types.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
+  // Handle CORS preflight request
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     const { jobId } = await req.json();
 
@@ -46,7 +52,7 @@ serve(async (req) => {
       await logActivity(supabase, jobId, 'No pending rows to classify', 'INFO');
       return new Response(
         JSON.stringify({ success: true, classifiedCount: 0 }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -147,13 +153,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, classifiedCount, uncertainCount }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Classify rules error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

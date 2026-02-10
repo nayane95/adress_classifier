@@ -5,8 +5,14 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, logActivity } from '../_shared/supabase.ts';
 import { classifyWithAI } from '../_shared/openai.ts';
 import { NormalizedContact, EnrichmentData, createAIInputHash } from '../_shared/types.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
+  // Handle CORS preflight request
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     const { jobId } = await req.json();
 
@@ -44,7 +50,7 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({ success: true, classifiedCount: 0, budgetCapReached: true }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -79,7 +85,7 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({ success: true, classifiedCount: 0 }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -243,13 +249,20 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, classifiedCount, cacheHits, totalTokens }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('AI classification error:', error);
     
     // Log error to activity feed
-    const { jobId } = await req.json();
+    let jobId = null;
+    try {
+        const body = await req.json();
+        jobId = body.jobId;
+    } catch (_) {
+        // failed to parse body or jobId not found
+    }
+
     if (jobId) {
       const supabase = createSupabaseClient();
       await logActivity(supabase, jobId, `AI classification error: ${error.message}`, 'ERROR');
@@ -262,7 +275,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

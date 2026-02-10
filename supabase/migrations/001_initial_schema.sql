@@ -131,20 +131,20 @@ ALTER TABLE enrichment_cache ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_cache ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_feed ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies (allow all for authenticated users - customize based on your auth strategy)
-CREATE POLICY "Allow all for authenticated users" ON jobs
+-- RLS Policies (allow all for public/anonymous users for development)
+CREATE POLICY "Allow all for public users" ON jobs
   FOR ALL USING (true);
 
-CREATE POLICY "Allow all for authenticated users" ON job_rows
+CREATE POLICY "Allow all for public users" ON job_rows
   FOR ALL USING (true);
 
-CREATE POLICY "Allow all for authenticated users" ON enrichment_cache
+CREATE POLICY "Allow all for public users" ON enrichment_cache
   FOR ALL USING (true);
 
-CREATE POLICY "Allow all for authenticated users" ON ai_cache
+CREATE POLICY "Allow all for public users" ON ai_cache
   FOR ALL USING (true);
 
-CREATE POLICY "Allow all for authenticated users" ON activity_feed
+CREATE POLICY "Allow all for public users" ON activity_feed
   FOR ALL USING (true);
 
 -- Enable Realtime for jobs and activity_feed

@@ -5,8 +5,14 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, logActivity } from '../_shared/supabase.ts';
 import { enrichContact } from '../_shared/enrichment.ts';
 import { NormalizedContact, createCacheKey } from '../_shared/types.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
+  // Handle CORS preflight request
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     const { jobId, depth = 1 } = await req.json();
 
@@ -36,7 +42,7 @@ serve(async (req) => {
       
       return new Response(
         JSON.stringify({ success: true, enrichedCount: 0, budgetCapReached: true }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -65,7 +71,7 @@ serve(async (req) => {
       await logActivity(supabase, jobId, 'No rows need enrichment', 'INFO');
       return new Response(
         JSON.stringify({ success: true, enrichedCount: 0 }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -170,13 +176,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, enrichedCount, cacheHits, searchCalls }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Enrich contacts error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

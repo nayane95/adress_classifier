@@ -5,8 +5,14 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { parse } from 'https://deno.land/std@0.168.0/encoding/csv.ts';
 import { createSupabaseClient, logActivity } from '../_shared/supabase.ts';
 import { EXPECTED_COLUMNS, COLUMN_COUNT, normalizeContact } from '../_shared/types.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
+  // Handle CORS preflight request
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     const { fileContent, filename, userId, language = 'en' } = await req.json();
 
@@ -22,7 +28,7 @@ serve(async (req) => {
     if (!rows || rows.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Empty CSV file' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -36,7 +42,7 @@ serve(async (req) => {
           error: `Invalid CSV schema. Expected ${COLUMN_COUNT} columns, got ${columnCount}`,
           expected: EXPECTED_COLUMNS,
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -118,13 +124,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, jobId: job.id, totalRows: rows.length }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Parse CSV error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
