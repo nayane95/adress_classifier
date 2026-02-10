@@ -59,7 +59,7 @@ export function JobAnalytics({ jobId }: AnalyticsProps) {
     // 1. Category Distribution
     const categories: Record<string, number> = {};
     rows.forEach(row => {
-      const cat = row.final_category || 'Unclassified';
+      const cat = row.final_category || 'A_QUALIFIER';
       categories[cat] = (categories[cat] || 0) + 1;
     });
 
@@ -212,7 +212,7 @@ export function JobAnalytics({ jobId }: AnalyticsProps) {
                 </div>
                  <div className="flex justify-between border-b pb-2">
                     <span className="text-muted-foreground">Unclassified / Needs Review</span>
-                    <span className="font-semibold text-amber-600">{categoryData.find(c => c.name === 'A_QUALIFIER' || c.name === 'Unclassified')?.value || 0}</span>
+                    <span className="font-semibold text-amber-600">{categoryData.find(c => c.name === 'A_QUALIFIER')?.value || 0}</span>
                 </div>
             </div>
         </CardContent>

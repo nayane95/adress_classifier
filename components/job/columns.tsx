@@ -10,9 +10,16 @@ export type JobRow = {
   final_category: string | null;
   confidence: number | null;
   needs_review: boolean;
-  classification_method: string;
+  classification_method: string | null;
   normalized_json: any;
-  enrichment_status: string;
+  enrichment_status: string | null;
+  ai_used: boolean;
+  manual_override: boolean;
+  last_processing_step: string | null;
+  reason_en: string | null;
+  reason_fr: string | null;
+  public_signals_en: string | null;
+  public_signals_fr: string | null;
 };
 
 export const columns: ColumnDef<JobRow>[] = [
@@ -45,10 +52,28 @@ export const columns: ColumnDef<JobRow>[] = [
 
       return (
         <Badge className={color}>
-          {category || 'Unclassified'}
+          {category || 'A_QUALIFIER'}
         </Badge>
       );
     },
+  },
+  {
+    accessorKey: 'public_signals_en',
+    header: 'Public Signals',
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground line-clamp-2 max-w-[200px]">
+        {row.original.public_signals_en || row.original.public_signals_fr || '-'}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'reason_en',
+    header: 'Reason',
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground line-clamp-2 max-w-[200px]">
+        {row.original.reason_en || row.original.reason_fr || '-'}
+      </span>
+    ),
   },
   {
     accessorKey: 'confidence',
@@ -88,5 +113,45 @@ export const columns: ColumnDef<JobRow>[] = [
         <CheckCircle className="h-4 w-4 text-green-500 opacity-20" />
       );
     },
+  },
+  {
+    accessorKey: 'ai_used',
+    header: 'AI',
+    cell: ({ row }) => (
+      <Badge variant={row.getValue('ai_used') ? 'default' : 'secondary'} className="text-[10px]">
+        {row.getValue('ai_used') ? 'YES' : 'NO'}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: 'enrichment_status',
+    header: 'Enrichment',
+    cell: ({ row }) => {
+      const status = row.getValue('enrichment_status') as string;
+      if (!status) return '-';
+      return (
+        <Badge variant="outline" className={`text-[10px] ${status === 'FAILED' ? 'text-red-500 border-red-200' : 'text-blue-500 border-blue-200'}`}>
+          {status}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'manual_override',
+    header: 'Override',
+    cell: ({ row }) => (
+      <Badge variant={row.getValue('manual_override') ? 'destructive' : 'secondary'} className="text-[10px]">
+        {row.getValue('manual_override') ? 'YES' : 'NO'}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: 'last_processing_step',
+    header: 'Step',
+    cell: ({ row }) => (
+      <span className="text-[10px] font-mono text-muted-foreground uppercase">
+        {row.getValue('last_processing_step') || '-'}
+      </span>
+    ),
   },
 ];
