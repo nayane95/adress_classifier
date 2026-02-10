@@ -25,6 +25,9 @@ export interface AIClassificationResponse {
   }>;
   model_used: string;
   tokens_used?: number;
+  system_prompt?: string;
+  user_prompt?: string;
+  raw_response?: string;
 }
 
 export async function classifyWithAI(
@@ -41,7 +44,8 @@ export async function classifyWithAI(
     ? Deno.env.get('OPENAI_MODEL_PRIMARY') || 'gpt-4o-mini'
     : Deno.env.get('OPENAI_MODEL_SECONDARY') || 'gpt-4o';
 
-  const prompt = buildPrompt(request);
+  const systemPrompt = getSystemPrompt(request.language);
+  const userPrompt = buildPrompt(request);
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -55,11 +59,11 @@ export async function classifyWithAI(
         messages: [
           {
             role: 'system',
-            content: getSystemPrompt(request.language),
+            content: systemPrompt,
           },
           {
             role: 'user',
-            content: prompt,
+            content: userPrompt,
           },
         ],
         response_format: {
@@ -111,6 +115,9 @@ export async function classifyWithAI(
       results: content.results,
       model_used: model,
       tokens_used: data.usage?.total_tokens,
+      system_prompt: systemPrompt,
+      user_prompt: userPrompt,
+      raw_response: JSON.stringify(content, null, 2),
     };
   } catch (error) {
     console.error('OpenAI classification error:', error);

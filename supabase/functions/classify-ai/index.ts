@@ -141,6 +141,23 @@ serve(async (req) => {
           true // Use primary model first
         );
 
+        // Log the AI interaction for debugging/visibility
+        await logActivity(
+          supabase,
+          jobId,
+          `AI Request (Primary Model) - Batch ${Math.floor(i / BATCH_SIZE) + 1}`,
+          'INFO',
+          {
+            type: 'AI_INTERACTION',
+            model: aiResponse.model_used,
+            system_prompt: aiResponse.system_prompt,
+            user_prompt: aiResponse.user_prompt,
+            raw_response: aiResponse.raw_response,
+            row_indices: contacts.map(c => c.index),
+            timestamp: new Date().toISOString()
+          }
+        );
+
         totalTokens += aiResponse.tokens_used || 0;
 
         // Check if we need to escalate to secondary model for low confidence results
@@ -152,9 +169,28 @@ serve(async (req) => {
             contacts.find(c => c.index === r.index)!
           );
 
+          await logActivity(supabase, jobId, `Escalating ${retryContacts.length} low-confidence rows to advanced model`, 'INFO');
+
           const retryResponse = await classifyWithAI(
             { contacts: retryContacts, language: job.language },
             false // Use secondary model
+          );
+
+          // Log the retry interaction
+          await logActivity(
+            supabase,
+            jobId,
+            `AI Request (Retry Model) - Batch ${Math.floor(i / BATCH_SIZE) + 1}`,
+            'INFO',
+            {
+              type: 'AI_INTERACTION',
+              model: retryResponse.model_used,
+              system_prompt: retryResponse.system_prompt,
+              user_prompt: retryResponse.user_prompt,
+              raw_response: retryResponse.raw_response,
+              row_indices: retryContacts.map(c => c.index),
+              timestamp: new Date().toISOString()
+            }
           );
 
           totalTokens += retryResponse.tokens_used || 0;

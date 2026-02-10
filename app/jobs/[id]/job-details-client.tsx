@@ -10,6 +10,9 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Download, RefreshCw, Activity } from 'lucide-react';
+import { DataTable } from '@/components/job/data-table';
+import { columns } from '@/components/job/columns';
+import { JobAnalytics } from '@/components/job/job-analytics';
 
 interface Job {
   id: string;
@@ -33,6 +36,7 @@ interface ActivityMessage {
   message: string;
   message_type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
   created_at: string;
+  metadata?: any;
 }
 
 export default function JobDetailsClient({ jobId }: { jobId: string }) {
@@ -288,8 +292,45 @@ export default function JobDetailsClient({ jobId }: { jobId: string }) {
                         className={`p-3 rounded-lg ${getMessageTypeColor(activity.message_type)}`}
                       >
                         <div className="flex items-start justify-between">
-                          <p className="text-sm font-medium">{activity.message}</p>
-                          <span className="text-xs opacity-70">
+                          <div className="space-y-1 w-full">
+                            <p className="text-sm font-medium">{activity.message}</p>
+                            
+                            {/* AI Log Details */}
+                            {activity.metadata?.type === 'AI_INTERACTION' && (
+                              <div className="mt-2 text-xs bg-black/5 dark:bg-white/5 p-2 rounded overflow-hidden">
+                                <details className="group">
+                                  <summary className="cursor-pointer font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                                    View Request & Response
+                                  </summary>
+                                  <div className="mt-2 space-y-2">
+                                    <div>
+                                      <span className="font-bold text-xs uppercase text-muted-foreground">Rows:</span>
+                                      <span className="ml-2 font-mono">{activity.metadata.row_indices?.join(', ')}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-bold text-xs uppercase text-muted-foreground">Model:</span>
+                                      <span className="ml-2 font-mono">{activity.metadata.model}</span>
+                                    </div>
+                                    
+                                    <div className="border-t pt-2 mt-2">
+                                      <p className="font-bold text-xs uppercase text-muted-foreground mb-1">User Prompt (Request)</p>
+                                      <pre className="whitespace-pre-wrap bg-slate-100 dark:bg-slate-950 p-2 rounded text-[10px] max-h-40 overflow-auto">
+                                        {activity.metadata.user_prompt}
+                                      </pre>
+                                    </div>
+
+                                    <div className="border-t pt-2">
+                                      <p className="font-bold text-xs uppercase text-muted-foreground mb-1">Raw Response</p>
+                                      <pre className="whitespace-pre-wrap bg-slate-100 dark:bg-slate-950 p-2 rounded text-[10px] max-h-60 overflow-auto">
+                                        {activity.metadata.raw_response}
+                                      </pre>
+                                    </div>
+                                  </div>
+                                </details>
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs opacity-70 whitespace-nowrap ml-2">
                             {new Date(activity.created_at).toLocaleTimeString()}
                           </span>
                         </div>
@@ -307,25 +348,13 @@ export default function JobDetailsClient({ jobId }: { jobId: string }) {
                   <CardDescription>View and edit classified contacts</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    Data table component will be implemented here with TanStack Table
-                  </p>
+                  <DataTable columns={columns} jobId={job.id} />
                 </CardContent>
               </Card>
             </TabsContent>
 
             <TabsContent value="analytics">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Analytics</CardTitle>
-                  <CardDescription>Classification insights and demographics</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Analytics charts will be implemented here with Recharts
-                  </p>
-                </CardContent>
-              </Card>
+              <JobAnalytics jobId={job.id} />
             </TabsContent>
           </Tabs>
 

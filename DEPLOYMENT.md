@@ -73,7 +73,10 @@ supabase secrets set ENRICHMENT_CACHE_TTL_DAYS=30
 supabase secrets set AI_CACHE_TTL_DAYS=90
 supabase secrets set OPENAI_MODEL_PRIMARY=gpt-4o-mini
 supabase secrets set OPENAI_MODEL_SECONDARY=gpt-4o
+supabase secrets set OPENAI_MODEL_SECONDARY=gpt-4o
 ```
+
+**Note:** The `classify-ai` function now includes enhanced logging for AI requests and responses. Redeploying is required to see these logs in the UI.
 
 ### 1.5 Get Supabase Credentials
 
