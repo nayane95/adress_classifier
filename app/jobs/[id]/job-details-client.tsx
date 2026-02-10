@@ -181,9 +181,27 @@ export default function JobDetailsClient({ jobId }: { jobId: string }) {
                 </p>
               </div>
             </div>
-            <Badge className={getStatusColor(job.status)}>
-              {tStatus(job.status)}
-            </Badge>
+            <div className="flex items-center gap-3">
+              {job.status !== 'COMPLETED' && job.status !== 'FAILED' && (
+                <Button 
+                  size="sm" 
+                  onClick={async () => {
+                    const { error } = await supabase.functions.invoke('orchestrate-job', {
+                      body: { jobId: job.id }
+                    });
+                    if (error) {
+                      console.error('Failed to trigger orchestrator:', error);
+                    }
+                  }}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Run Classification
+                </Button>
+              )}
+              <Badge className={getStatusColor(job.status)}>
+                {tStatus(job.status)}
+              </Badge>
+            </div>
           </div>
         </div>
       </header>

@@ -122,6 +122,11 @@ serve(async (req) => {
       'SUCCESS'
     );
 
+    // Trigger orchestrator to start the classification pipeline
+    supabase.functions.invoke('orchestrate-job', {
+      body: { jobId: job.id }
+    }).catch(err => console.error('Orchestrator trigger error:', err));
+
     return new Response(
       JSON.stringify({ success: true, jobId: job.id, totalRows: rows.length }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

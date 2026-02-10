@@ -58,6 +58,7 @@ supabase functions deploy parse-csv
 supabase functions deploy classify-rules
 supabase functions deploy enrich-contacts
 supabase functions deploy classify-ai
+supabase functions deploy orchestrate-job
 
 # Set secrets for Edge Functions
 supabase secrets set OPENAI_API_KEY=sk-...
