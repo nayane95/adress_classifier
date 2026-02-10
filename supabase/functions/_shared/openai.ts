@@ -127,52 +127,51 @@ export async function classifyWithAI(
 
 function getSystemPrompt(language: 'en' | 'fr'): string {
   if (language === 'fr') {
-    return `Vous êtes un expert en classification de contacts professionnels. Classifiez chaque contact dans EXACTEMENT UNE catégorie:
+    return `Vous êtes un expert en classification de contacts professionnels. Votre tâche est d'analyser les informations fournies (nom, email, activités et surtout les signaux d'enrichissement web) pour classer chaque contact dans l'une de ces catégories :
 
-- CLIENT: Clients finaux, acheteurs, consommateurs, patients directs
-- PRESCRIBER: Médecins, prescripteurs, professionnels de santé, cliniques, hôpitaux, pharmaciens
-- SUPPLIER: Fournisseurs, vendeurs, distributeurs, grossistes, fabricants
+- CLIENT : Particuliers, clients finaux, consommateurs, patients (si contact direct).
+- PRESCRIBER : Professionnels de santé (médecins, dentistes, etc.), cliniques, hôpitaux, pharmacies, ou toute entité qui recommande des services de santé.
+- SUPPLIER : Fournisseurs de produits ou services, grossistes, fabricants, distributeurs B2B.
 
-Utilisez A_QUALIFIER UNIQUEMENT en dernier recours si aucune classification n'est possible.
-
-Règles strictes:
-1. Préférez toujours CLIENT, PRESCRIBER ou SUPPLIER à A_QUALIFIER
-2. Utilisez les signaux publics disponibles (nom, activités, email, enrichissement)
-3. Fournissez une raison concise (≤160 caractères)
-4. Listez les signaux utilisés (≤240 caractères)
-5. Marquez needs_review=true si confidence < 70%`;
+CONSIGNES CRUCIALES :
+1. ANALYSE PROFONDE : Ne dites pas "Informations insuffisantes" si vous pouvez faire une déduction raisonnable basée sur le nom de l'entreprise ou les snippets de recherche.
+2. SIGNES D'ENRICHISSEMENT : Les données d'enrichissement (snippets web, titres de sites) sont votre source de vérité la plus forte. Analysez-les attentivement.
+3. RAISONNEMENT HUMAIN : La 'reason' doit expliquer POURQUOI vous avez choisi cette catégorie (ex: "Le site web mentionne la vente en gros de matériel médical" ou "Snippet de recherche indique une clinique dentaire à Paris").
+4. ÉVITEZ A_QUALIFIER : Utilisez A_QUALIFIER uniquement en cas d'absence totale d'informations exploitables.
+5. CONFIANCE : Soyez précis. Si une entité est clairement une clinique, la confiance doit être de 90%+.`;
   }
 
-  return `You are an expert at classifying professional contacts. Classify each contact into EXACTLY ONE category:
+  return `You are an expert at classifying professional contacts for a business database. Your goal is to use provided data (name, email, activities, and web enrichment signals) to categorize contacts accurately.
 
-- CLIENT: End clients, buyers, consumers, direct patients
-- PRESCRIBER: Doctors, prescribers, healthcare professionals, clinics, hospitals, pharmacists
-- SUPPLIER: Suppliers, vendors, distributors, wholesalers, manufacturers
+CATEGORIES:
+- CLIENT: End consumers, direct patients, individual buyers.
+- PRESCRIBER: Doctors, dentists, medical specialists, clinics, hospitals, pharmacies, or entities that prescribe/refer healthcare services.
+- SUPPLIER: Product/service providers, wholesalers, manufacturers, B2B distributors.
 
-Use A_QUALIFIER ONLY as a last resort if no classification is possible.
-
-Strict rules:
-1. Always prefer CLIENT, PRESCRIBER, or SUPPLIER over A_QUALIFIER
-2. Use available public signals (name, activities, email, enrichment)
-3. Provide concise reason (≤160 chars)
-4. List signals used (≤240 chars)
-5. Mark needs_review=true if confidence < 70%`;
+CRITICAL INSTRUCTIONS:
+1. ANALYTICAL REASONING: Do not use generic "insufficient information" responses. Analyze the business name, email domain, and enrichment snippets to make a logical deduction.
+2. ENRICHMENT DATA: The web search snippets and website metadata provided are your strongest signals. Look for keywords like "dr.", "clinic", "hospital" (PRESCRIBER) or "solutions", "group", "ltd" (look deeper for CLIENT/SUPPLIER).
+3. HUMAN-READABLE REASON: The 'reason' field must be a clear, human-readable sentence explaining the evidence (e.g., "The search results confirm this is a specialized medical clinic" or "The email domain and name suggest a private individual client").
+4. A_QUALIFIER LIMITATION: Use A_QUALIFIER ONLY if there is zero evidence to differentiate. Prefer a logical guess with lower confidence over A_QUALIFIER.
+5. CONFIDENCE SCORING: Provide realistic confidence. Clear matches based on enrichment should be 90%+.`;
 }
 
 function buildPrompt(request: AIClassificationRequest): string {
-  const contactsText = request.contacts.map((c, i) => {
+  const contactsText = request.contacts.map((c) => {
     const parts = [
-      `[${c.index}] ${c.nom_complet}`,
+      `ID: ${c.index} | Name: ${c.nom_complet}`,
     ];
 
-    if (c.activites) parts.push(`Activities: ${c.activites}`);
     if (c.email) parts.push(`Email: ${c.email}`);
-    if (c.ville) parts.push(`City: ${c.ville}`);
-    if (c.pays) parts.push(`Country: ${c.pays}`);
-    if (c.enrichment_summary) parts.push(`Enrichment: ${c.enrichment_summary}`);
+    if (c.activites) parts.push(`Stated Activities: ${c.activites}`);
+    if (c.ville || c.pays) parts.push(`Location: ${c.ville || ''}, ${c.pays || ''}`);
+    
+    if (c.enrichment_summary) {
+      parts.push(`WEB ENRICHMENT: ${c.enrichment_summary}`);
+    }
 
-    return parts.join(' | ');
-  }).join('\n');
+    return parts.join('\n');
+  }).join('\n\n---\n\n');
 
-  return `Classify these contacts:\n\n${contactsText}`;
+  return `Please classify the following contacts based on all available data:\n\n${contactsText}`;
 }

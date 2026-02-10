@@ -27,6 +27,7 @@ interface Job {
   search_calls_count: number;
   ai_tokens_estimate: number;
   current_step: string | null;
+  language: 'en' | 'fr';
   created_at: string;
   updated_at: string;
 }
@@ -381,7 +382,66 @@ export default function JobDetailsClient({ jobId }: { jobId: string }) {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex gap-3">
-                  <Button className="flex-1">
+                  <Button 
+                    className="flex-1"
+                    onClick={async () => {
+                      try {
+                        // Fetch all rows for the job
+                        const { data: rows, error } = await supabase
+                          .from('job_rows')
+                          .select('row_index, final_category, confidence, reason_en, reason_fr, public_signals_en, public_signals_fr, classification_method, ai_used, enrichment_status, manual_override, last_processing_step, normalized_json')
+                          .eq('job_id', job.id)
+                          .order('row_index', { ascending: true });
+
+                        if (error) throw error;
+                        if (!rows || rows.length === 0) return;
+
+                        const typedRows = rows as any[];
+                        
+                        // Create CSV content
+                        const headers = [
+                          'ID', 'Category', 'Confidence', 'Reason', 'Public Signals', 'Method', 'AI Used', 'Enrichment', 'Override', 'Step'
+                        ];
+                        
+                        // Add normalized fields from input CSV
+                        const firstRowKeys = Object.keys(typedRows[0].normalized_json || {});
+                        const allHeaders = [...headers, ...firstRowKeys];
+                        
+                        const csvRows = typedRows.map(row => {
+                          const baseData = [
+                            row.row_index,
+                            row.final_category || 'A_QUALIFIER',
+                            `${row.confidence || 0}%`,
+                            job.language === 'fr' ? row.reason_fr : row.reason_en,
+                            job.language === 'fr' ? row.public_signals_fr : row.public_signals_en,
+                            row.classification_method,
+                            row.ai_used ? 'YES' : 'NO',
+                            row.enrichment_status,
+                            row.manual_override ? 'YES' : 'NO',
+                            row.last_processing_step
+                          ];
+                          
+                          const normalizedData = firstRowKeys.map(key => row.normalized_json?.[key] || '');
+                          
+                          return [...baseData, ...normalizedData].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
+                        });
+
+                        const csvContent = [allHeaders.join(','), ...csvRows].join('\n');
+                        
+                        // Download the file
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', `job_${job.id.substring(0, 8)}_export.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      } catch (err) {
+                        console.error('Export failed:', err);
+                      }
+                    }}
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Export CSV
                   </Button>

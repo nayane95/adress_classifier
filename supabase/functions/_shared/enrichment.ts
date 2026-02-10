@@ -185,12 +185,16 @@ function createSignalsSummary(data: EnrichmentData): string {
     signals.push(`Categories: ${data.maps_categories.slice(0, 3).join(', ')}`);
   }
 
-  if (data.website_title) {
-    signals.push(`Website: ${data.website_title.substring(0, 50)}`);
+  if (data.website_title || data.website_description) {
+    const title = data.website_title ? `Title: ${data.website_title}` : '';
+    const desc = data.website_description ? `Desc: ${data.website_description.substring(0, 100)}...` : '';
+    signals.push(`Website Details: ${title} ${desc}`);
   }
 
   if (data.search_snippets && data.search_snippets.length > 0) {
-    signals.push(`Found in search: ${data.search_snippets[0].substring(0, 80)}...`);
+    // Include top 2 snippets for more context
+    const combinedSnippets = data.search_snippets.slice(0, 2).map(s => s.substring(0, 150)).join(' | ');
+    signals.push(`Search Results: ${combinedSnippets}`);
   }
 
   return signals.join('; ');
