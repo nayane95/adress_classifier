@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, AlertTriangle, HelpCircle } from 'lucide-react';
+import { Avatar } from '@/components/ui/avatar';
 
 export type JobRow = {
   id: string;
@@ -27,6 +28,17 @@ export const columns: ColumnDef<JobRow>[] = [
     accessorKey: 'row_index',
     header: '#',
     cell: ({ row }) => <span className="text-muted-foreground">{row.getValue('row_index')}</span>,
+  },
+  {
+    id: 'avatar',
+    header: 'Avatar',
+    cell: ({ row }) => (
+      <Avatar 
+        base64Svg={row.original.normalized_json?.avatar} 
+        fallbackText={row.original.normalized_json?.nom_complet}
+        size="sm"
+      />
+    ),
   },
   {
     id: 'name',

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar } from '@/components/ui/avatar';
 import { JobRow } from './columns';
 import { 
   Building2, 
@@ -26,7 +27,6 @@ import {
   ExternalLink,
   History
 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 
 interface RowDetailDrawerProps {
   row: JobRow | null;
@@ -58,16 +58,24 @@ export function RowDetailDrawer({ row, isOpen, onClose }: RowDetailDrawerProps) 
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()} direction="right">
       <DrawerContent className="h-full mt-0 rounded-none border-l shadow-2xl overflow-y-auto">
         <DrawerHeader className="border-b bg-slate-50/50 pb-6">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <DrawerTitle className="text-2xl font-bold tracking-tight text-slate-900">
-                {row.normalized_json?.nom_complet || 'Unnamed Contact'}
-              </DrawerTitle>
-              <DrawerDescription className="flex items-center gap-2">
-                <span className="font-mono text-xs uppercase tracking-wider bg-slate-200 px-1.5 py-0.5 rounded">Row #{row.row_index}</span>
-                <span>•</span>
-                <span className="text-slate-500">ID: {row.id.substring(0, 8)}</span>
-              </DrawerDescription>
+          <div className="flex justify-between items-start gap-4">
+            <div className="flex items-start gap-4 flex-1">
+              <Avatar 
+                base64Svg={row.normalized_json?.avatar} 
+                fallbackText={row.normalized_json?.nom_complet}
+                size="xl"
+                className="mt-1"
+              />
+              <div className="space-y-1 flex-1">
+                <DrawerTitle className="text-2xl font-bold tracking-tight text-slate-900">
+                  {row.normalized_json?.nom_complet || 'Unnamed Contact'}
+                </DrawerTitle>
+                <DrawerDescription className="flex items-center gap-2">
+                  <span className="font-mono text-xs uppercase tracking-wider bg-slate-200 px-1.5 py-0.5 rounded">Row #{row.row_index}</span>
+                  <span>•</span>
+                  <span className="text-slate-500">ID: {row.id.substring(0, 8)}</span>
+                </DrawerDescription>
+              </div>
             </div>
             <Badge className={`${getCategoryColor(row.final_category)} px-3 py-1 text-sm font-semibold`}>
               {row.final_category || 'A_QUALIFIER'}
