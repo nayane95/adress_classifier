@@ -1,0 +1,88 @@
+{
+  "common": {
+    "appName": "Classificateur de Contacts",
+    "upload": "Télécharger",
+    "download": "Télécharger",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "language": "Langue"
+  },
+  "categories": {
+    "CLIENT": "Client",
+    "PRESCRIBER": "Prescripteur",
+    "SUPPLIER": "Fournisseur",
+    "A_QUALIFIER": "À Qualifier"
+  },
+  "upload": {
+    "title": "Télécharger un fichier CSV",
+    "subtitle": "Téléchargez votre CSV de contacts pour une classification automatique",
+    "dragDrop": "Glissez-déposez votre fichier CSV ici, ou cliquez pour parcourir",
+    "fileSelected": "Fichier sélectionné",
+    "uploading": "Téléchargement...",
+    "validating": "Validation du schéma...",
+    "schemaError": "Schéma CSV invalide. 25 colonnes attendues.",
+    "uploadSuccess": "Fichier téléchargé avec succès"
+  },
+  "jobs": {
+    "title": "Tâches de Classification",
+    "status": "Statut",
+    "progress": "Progression",
+    "aiUsage": "Utilisation IA",
+    "avgConfidence": "Confiance Moy.",
+    "needsReview": "À Réviser",
+    "totalRows": "Lignes Totales",
+    "processedRows": "Lignes Traitées",
+    "viewDetails": "Voir Détails",
+    "viewData": "Voir Données",
+    "viewAnalytics": "Voir Analytiques"
+  },
+  "jobDetail": {
+    "title": "Détails de la Tâche",
+    "activityFeed": "Flux d'Activité",
+    "currentStep": "Étape Actuelle",
+    "processingBatch": "Traitement du lot",
+    "estimatedTime": "Temps restant estimé"
+  },
+  "table": {
+    "columns": "Colonnes",
+    "rows": "lignes",
+    "selected": "sélectionné",
+    "clearFilters": "Effacer les filtres",
+    "noResults": "Aucun résultat trouvé",
+    "editRow": "Modifier la ligne",
+    "viewDetails": "Voir les détails"
+  },
+  "analytics": {
+    "title": "Analytiques",
+    "categoryDistribution": "Distribution par Catégorie",
+    "confidenceDistribution": "Distribution de Confiance",
+    "geographicBreakdown": "Répartition Géographique",
+    "aiVsRules": "Classification IA vs Règles",
+    "byCountry": "Par Pays",
+    "byCity": "Par Ville"
+  },
+  "status": {
+    "PENDING": "En Attente",
+    "PARSING": "Analyse",
+    "RULES": "Classification par Règles",
+    "ENRICHING": "Enrichissement",
+    "AI_CLASSIFYING": "Classification IA",
+    "COMPLETED": "Terminé",
+    "FAILED": "Échoué"
+  },
+  "badges": {
+    "aiUsed": "IA Utilisée",
+    "manualOverride": "Modification Manuelle",
+    "needsReview": "À Réviser",
+    "highConfidence": "Haute Confiance",
+    "lowConfidence": "Faible Confiance"
+  }
+}

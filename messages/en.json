@@ -1,0 +1,88 @@
+{
+  "common": {
+    "appName": "Contact Classifier",
+    "upload": "Upload",
+    "download": "Download",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "language": "Language"
+  },
+  "categories": {
+    "CLIENT": "Client",
+    "PRESCRIBER": "Prescriber",
+    "SUPPLIER": "Supplier",
+    "A_QUALIFIER": "To Qualify"
+  },
+  "upload": {
+    "title": "Upload CSV File",
+    "subtitle": "Upload your contact CSV to classify automatically",
+    "dragDrop": "Drag and drop your CSV file here, or click to browse",
+    "fileSelected": "File selected",
+    "uploading": "Uploading...",
+    "validating": "Validating schema...",
+    "schemaError": "Invalid CSV schema. Expected 25 columns.",
+    "uploadSuccess": "File uploaded successfully"
+  },
+  "jobs": {
+    "title": "Classification Jobs",
+    "status": "Status",
+    "progress": "Progress",
+    "aiUsage": "AI Usage",
+    "avgConfidence": "Avg Confidence",
+    "needsReview": "Needs Review",
+    "totalRows": "Total Rows",
+    "processedRows": "Processed Rows",
+    "viewDetails": "View Details",
+    "viewData": "View Data",
+    "viewAnalytics": "View Analytics"
+  },
+  "jobDetail": {
+    "title": "Job Details",
+    "activityFeed": "Activity Feed",
+    "currentStep": "Current Step",
+    "processingBatch": "Processing batch",
+    "estimatedTime": "Estimated time remaining"
+  },
+  "table": {
+    "columns": "Columns",
+    "rows": "rows",
+    "selected": "selected",
+    "clearFilters": "Clear filters",
+    "noResults": "No results found",
+    "editRow": "Edit row",
+    "viewDetails": "View details"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "categoryDistribution": "Category Distribution",
+    "confidenceDistribution": "Confidence Distribution",
+    "geographicBreakdown": "Geographic Breakdown",
+    "aiVsRules": "AI vs Rules Classification",
+    "byCountry": "By Country",
+    "byCity": "By City"
+  },
+  "status": {
+    "PENDING": "Pending",
+    "PARSING": "Parsing",
+    "RULES": "Rules Classification",
+    "ENRICHING": "Enriching",
+    "AI_CLASSIFYING": "AI Classification",
+    "COMPLETED": "Completed",
+    "FAILED": "Failed"
+  },
+  "badges": {
+    "aiUsed": "AI Used",
+    "manualOverride": "Manual Override",
+    "needsReview": "Needs Review",
+    "highConfidence": "High Confidence",
+    "lowConfidence": "Low Confidence"
+  }
+}
