@@ -23,6 +23,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createClient } from '@/lib/supabase/client';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { RowDetailDrawer } from './row-detail-drawer';
+import { JobRow } from './columns';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -37,6 +39,10 @@ export function DataTable<TData, TValue>({
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  
+  // Drawer state
+  const [selectedRow, setSelectedRow] = useState<JobRow | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const supabase = createClient();
 
@@ -60,6 +66,11 @@ export function DataTable<TData, TValue>({
 
     fetchData();
   }, [jobId]);
+
+  const handleRowClick = (row: TData) => {
+    setSelectedRow(row as unknown as JobRow);
+    setIsDrawerOpen(true);
+  };
 
   const table = useReactTable({
     data,
@@ -90,7 +101,7 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -125,6 +136,8 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  onClick={() => handleRowClick(row.original)}
+                  className="cursor-pointer hover:bg-slate-50 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -164,6 +177,13 @@ export function DataTable<TData, TValue>({
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Row Detail Drawer */}
+      <RowDetailDrawer 
+        row={selectedRow} 
+        isOpen={isDrawerOpen} 
+        onClose={() => setIsDrawerOpen(false)} 
+      />
     </div>
   );
 }

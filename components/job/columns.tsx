@@ -61,18 +61,22 @@ export const columns: ColumnDef<JobRow>[] = [
     accessorKey: 'public_signals_en',
     header: 'Public Signals',
     cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground line-clamp-2 max-w-[200px]">
-        {row.original.public_signals_en || row.original.public_signals_fr || '-'}
-      </span>
+      <div className="min-w-[300px] whitespace-normal">
+        <p className="text-xs text-muted-foreground">
+          {row.original.public_signals_en || row.original.public_signals_fr || '-'}
+        </p>
+      </div>
     ),
   },
   {
     accessorKey: 'reason_en',
     header: 'Reason',
     cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground line-clamp-2 max-w-[200px]">
-        {row.original.reason_en || row.original.reason_fr || '-'}
-      </span>
+      <div className="min-w-[300px] whitespace-normal">
+        <p className="text-xs text-muted-foreground">
+          {row.original.reason_en || row.original.reason_fr || '-'}
+        </p>
+      </div>
     ),
   },
   {
